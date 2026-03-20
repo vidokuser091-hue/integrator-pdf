@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<body>
+
+<h2>Integrator PDF</h2>
+
+<input type="file" id="f">
+<button onclick="u()">Upload</button>
+
+<input placeholder="filtr" oninput="load()">
+
+<table border="1" id="t"></table>
+
+<script>
+function u(){
+ let f = document.getElementById("f").files[0];
+ let d = new FormData();
+ d.append("file", f);
+
+ fetch("/upload",{method:"POST",body:d})
+ .then(()=>load());
+}
+
+function load(){
+ fetch("/oferty").then(r=>r.json()).then(d=>{
+  let f = document.querySelector("input[placeholder]").value.toLowerCase();
+  let t = document.getElementById("t");
+  t.innerHTML="";
+
+  d.filter(x=>x.zespolenie.toLowerCase().includes(f))
+   .forEach(x=>{
+    t.innerHTML += `<tr>
+     <td>${x.zespolenie}</td>
+     <td>${x.cena}</td>
+     <td><a href="/pdf/${x.plik.split('/').pop()}" target="_blank">${x.oferta}</a></td>
+    </tr>`;
+   });
+ });
+}
+
+load();
+</script>
+
+</body>
+</html>
